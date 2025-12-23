@@ -1,0 +1,335 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgroMind Dashboard</title>
+
+  <!-- Libraries -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    :root {
+      --primary: #28a745;
+      --dark: #155724;
+      --light-bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text: #212529;
+      --muted: #6c757d;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--light-bg);
+      color: var(--text);
+      margin: 0;
+    }
+
+    /* Layout */
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background-color: var(--card-bg);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      position: fixed;
+      height: 100%;
+      top: 0;
+      left: 0;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar.collapsed {
+      transform: translateX(-100%);
+    }
+
+    .sidebar h2 {
+      font-weight: 700;
+      color: var(--dark);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .nav-links {
+      flex-grow: 1;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      color: var(--muted);
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.3s;
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link i {
+      margin-right: 0.75rem;
+      font-size: 1.2rem;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background-color: var(--primary);
+      color: #fff;
+    }
+
+    .logout-btn {
+      background-color: #dc3545;
+      color: #fff;
+      text-align: center;
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-decoration: none;
+      font-weight: 500;
+      margin-top: 1rem;
+      display: block;
+    }
+
+    .logout-btn:hover {
+      background-color: #b02a37;
+      color: #fff;
+    }
+
+    /* Main */
+    .main-content {
+      flex-grow: 1;
+      margin-left: 260px;
+      padding: 2rem 3rem;
+      transition: margin-left 0.3s;
+    }
+
+    /* Top Navbar */
+    .top-navbar {
+      background: #fff;
+      padding: 0.75rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .menu-btn {
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: none;
+    }
+
+    /* Header */
+    .header h1 {
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .header p {
+      color: var(--muted);
+    }
+
+    /* Data Cards */
+    .data-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .data-card {
+      background-color: var(--card-bg);
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition: 0.3s;
+      text-align: center;
+    }
+
+    .data-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .data-card h4 {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .data-card .value {
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Features */
+    .features {
+      margin-top: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      background-color: var(--card-bg);
+      border-radius: 14px;
+      padding: 1.75rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .feature-card:hover {
+      background-color: var(--primary);
+      color: #fff;
+      transform: translateY(-5px);
+    }
+
+    .feature-card i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--card-bg);
+      color: var(--muted);
+      text-align: center;
+      padding: 1.25rem;
+      border-radius: 12px;
+      margin-top: 3rem;
+    }
+
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.collapsed {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 1.5rem;
+      }
+
+      .menu-btn {
+        display: block;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div>
+        <h2>AgroMind 🌱</h2>
+        <div class="nav-links">
+          <a href="{% url 'home' %}" class="nav-link active"><i class="fas fa-home"></i>Home</a>
+          <a href="{% url 'equipment' %}" class="nav-link"><i class="fas fa-tools"></i>Equipment</a>
+          <a href="{% url 'chatbot' %}" class="nav-link"><i class="fas fa-robot"></i>Chatbot</a>
+          <a href="{% url 'reports' %}" class="nav-link"><i class="fas fa-chart-line"></i>Reports</a>
+          <hr />
+          <a href="{% url 'profile' %}" class="nav-link"><i class="fas fa-user-circle"></i>Profile</a>
+          <a href="{% url 'settings' %}" class="nav-link"><i class="fas fa-cog"></i>Settings</a>
+        </div>
+      </div>
+      <a href="{% url 'logout' %}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Top Navbar -->
+      <div class="top-navbar">
+        <span class="menu-btn" id="menu-btn"><i class="fas fa-bars"></i></span>
+        <h4>Dashboard</h4>
+        <div>
+          <a href="#"><i class="fas fa-bell me-3"></i></a>
+          <a href="#"><i class="fas fa-user-circle"></i></a>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <div class="header">
+        <h1>Welcome, {{ user.username }}!</h1>
+        <p>Here’s an overview of your farm’s live sensor data.</p>
+      </div>
+
+      <!-- Data Cards -->
+      <div class="data-cards">
+        <div class="data-card">
+          <h4>Soil Moisture</h4>
+          <p class="value">
+            {% if last_data %}{{ last_data.soil_moisture|default:"N/A" }}%{% else %}N/A{% endif %}
+          </p>
+        </div>
+        <div class="data-card">
+          <h4>Temperature</h4>
+          <p class="value">
+            {% if last_data %}{{ last_data.temperature|default:"N/A" }}°C{% else %}N/A{% endif %}
+          </p>
+        </div>
+        <div class="data-card">
+          <h4>Humidity</h4>
+          <p class="value">
+            {% if last_data %}{{ last_data.humidity|default:"N/A" }}%{% else %}N/A{% endif %}
+          </p>
+        </div>
+        <div class="data-card">
+          <h4>pH Value</h4>
+          <p class="value">
+            {% if last_data %}{{ last_data.ph_value|default:"N/A" }}{% else %}N/A{% endif %}
+          </p>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <h3 class="mt-4 mb-3">Quick Actions</h3>
+      <div class="features">
+        <div class="feature-card" onclick="location.href='{% url 'equipment' %}'">
+          <i class="fas fa-tools"></i>
+          <h5>Equipment Status</h5>
+        </div>
+        <div class="feature-card" onclick="location.href='{% url 'chatbot' %}'">
+          <i class="fas fa-robot"></i>
+          <h5>Chatbot</h5>
+        </div>
+        <div class="feature-card" onclick="location.href='{% url 'reports' %}'">
+          <i class="fas fa-chart-line"></i>
+          <h5>Reports</h5>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer>
+        &copy; 2025 AgroMind. All rights reserved.
+      </footer>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const menuBtn = document.getElementById('menu-btn');
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+    });
+  </script>
+</body>
+</html>

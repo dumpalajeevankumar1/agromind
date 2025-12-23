@@ -1,0 +1,259 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgroMind Chatbot</title>
+
+<!-- Bootstrap & Fonts -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+:root {
+  --primary-green: #28a745;
+  --dark-green: #155724;
+  --bg-light: #f8f9fa;
+  --card-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --text-color: #333333;
+  --muted-text: #6c757d;
+}
+
+body { font-family: 'Inter', sans-serif; background-color: var(--bg-light); color: var(--text-color); margin: 0; }
+.dashboard-container { display: flex; min-height: 100vh; }
+
+/* Sidebar */
+.sidebar { width: 280px; background-color: var(--card-bg); padding: 2rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display:flex; flex-direction: column; justify-content: space-between; }
+.sidebar-header h2 { color: var(--dark-green); font-weight: 700; font-size: 1.5rem; }
+.nav-links .nav-link { display:flex; align-items:center; padding:0.75rem 1rem; margin-bottom:0.5rem; color: var(--muted-text); border-radius:10px; text-decoration:none; font-weight:500; transition: all 0.3s; }
+.nav-links .nav-link i { margin-right:0.75rem; font-size:1.2rem; }
+.nav-links .nav-link:hover, .nav-links .nav-link.active { background-color: var(--primary-green); color:#fff; }
+
+/* Main Content */
+.main-content { flex-grow:1; padding:2rem 3rem; display:flex; flex-direction:column; }
+.header h1 { font-weight:700; color: var(--dark-green); margin-bottom:0.25rem; }
+.header p { font-size:0.95rem; color: var(--muted-text); margin-bottom:1rem; }
+
+/* Chatbot */
+.chatbot-container { background-color: var(--card-bg); border-radius: 12px; padding: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display:flex; flex-direction:column; flex-grow:1; }
+#chat-window {
+    height: 400px; 
+    overflow-y: auto;
+    border:1px solid var(--border-color);
+    border-radius:8px;
+    padding:1rem;
+    background-color: var(--bg-light);
+    display:flex;
+    flex-direction:column;
+    gap:0.5rem;
+}
+.chat-message { display:flex; align-items: center; }
+.chat-message.user { justify-content:flex-end; }
+.chat-message.bot { justify-content:flex-start; }
+.chat-message .bubble { padding:0.5rem 1rem; border-radius:1.5rem; max-width:75%; word-wrap: break-word; }
+.chat-message.user .bubble { background-color: var(--primary-green); color:#fff; }
+.chat-message.bot .bubble { background-color:#e9ecef; color: var(--text-color); }
+
+/* Typing dots animation */
+.typing-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin: 0 2px;
+    background-color: var(--text-color);
+    border-radius: 50%;
+    animation: blink 1.4s infinite both;
+}
+.typing-dot:nth-child(1) { animation-delay: 0s; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+    0%, 80%, 100% { opacity: 0; }
+    40% { opacity: 1; }
+}
+
+/* Input */
+.input-group { display:flex; gap:0.25rem; margin-top:0.5rem; }
+.input-group input, .input-group select { border-radius:25px; padding:0.5rem 1rem; border:1px solid var(--border-color); flex-grow:1; }
+.input-group select { width:auto; }
+.input-group .btn { border-radius:25px; padding:0.5rem 1rem; }
+.voice-btn { background-color: var(--primary-green); color:#fff; border:none; }
+.voice-btn:hover { background-color: var(--dark-green); }
+
+/* Play/Pause buttons */
+.play-btn, .pause-btn { font-size:0.8rem; margin-left:0.5rem; }
+
+@media(max-width:992px){ .main-content { padding:1.5rem; } .sidebar { width:220px; } }
+</style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header"><h2>AgroChat 🌱</h2></div>
+    <div class="nav-links my-4">
+      <a href="{% url 'home' %}" class="nav-link"><i class="fas fa-home"></i> Home</a>
+      <a href="{% url 'equipment' %}" class="nav-link"><i class="fas fa-tools"></i> Equipment Status</a>
+      <a href="{% url 'chatbot' %}" class="nav-link active"><i class="fas fa-robot"></i> Chatbot</a>
+      <a href="{% url 'reports' %}" class="nav-link"><i class="fas fa-chart-line"></i> Reports</a>
+      <hr>
+      <a href="{% url 'profile' %}" class="nav-link"><i class="fas fa-user-circle"></i> Profile</a>
+      <a href="{% url 'settings' %}" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+      <a href="{% url 'logout' %}" class="btn btn-outline-danger w-100 mt-3"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="header">
+      <h1>Chat with AgroMind</h1>
+      <p class="text-muted">Ask about agriculture, crops, soil, water, weather, pesticides, or farm equipment.</p>
+    </div>
+
+    <div class="chatbot-container">
+      <div id="chat-window">
+        {% for log in chat_logs %}
+          <div class="chat-message user"><div class="bubble">{{ log.question }}</div></div>
+          <div class="chat-message bot"><div class="bubble">{{ log.answer }}</div></div>
+        {% endfor %}
+      </div>
+      <div class="input-group">
+        <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off">
+        <select id="language-select">
+          <option value="en">English</option>
+          <option value="hi">Hindi</option>
+          <option value="te">Telugu</option>
+        </select>
+        <button class="btn voice-btn" id="voice-btn"><i class="fas fa-microphone"></i></button>
+        <button class="btn btn-success" id="send-btn">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const chatWindow = document.getElementById('chat-window');
+const chatInput = document.getElementById('chat-input');
+const sendBtn = document.getElementById('send-btn');
+const voiceBtn = document.getElementById('voice-btn');
+const langSelect = document.getElementById('language-select');
+
+let typingIndicator = null;
+let currentAudio = null;
+
+// Scroll to bottom
+function scrollToBottom() {
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+// Typing animation
+function showTyping() {
+    typingIndicator = document.createElement('div');
+    typingIndicator.classList.add('chat-message', 'bot');
+    typingIndicator.innerHTML = `<div class="bubble">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+    </div>`;
+    chatWindow.appendChild(typingIndicator);
+    scrollToBottom();
+}
+
+function removeTyping() {
+    if (typingIndicator) {
+        chatWindow.removeChild(typingIndicator);
+        typingIndicator = null;
+    }
+}
+
+function appendMessage(message, sender, audioBase64=null) {
+    removeTyping();
+    const div = document.createElement('div');
+    div.classList.add('chat-message', sender);
+
+    if (sender === 'bot' && audioBase64) {
+        div.innerHTML = `
+            <div class="bubble">${message}</div>
+            <button class="btn btn-sm btn-outline-primary play-btn">▶ Play</button>
+            <button class="btn btn-sm btn-outline-danger pause-btn">⏸ Pause</button>
+        `;
+    } else {
+        div.innerHTML = `<div class="bubble">${message}</div>`;
+    }
+
+    chatWindow.appendChild(div);
+    scrollToBottom();
+
+    if (audioBase64) {
+        const audio = new Audio("data:audio/mp3;base64," + audioBase64);
+        div.querySelector('.play-btn').addEventListener('click', () => {
+            if (currentAudio && !currentAudio.paused) currentAudio.pause();
+            currentAudio = audio;
+            audio.play();
+        });
+        div.querySelector('.pause-btn').addEventListener('click', () => audio.pause());
+    }
+}
+
+// Send message
+async function sendMessage() {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+
+    appendMessage(msg, 'user');
+    chatInput.value = '';
+
+    showTyping();
+
+    try {
+        const response = await fetch("{% url 'farming_chatbot' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({ message: msg, language: langSelect.value })
+        });
+
+        const data = await response.json();
+        appendMessage(data.reply || "❌ No response from server.", 'bot', data.audio);
+    } catch (err) {
+        appendMessage("❌ Could not connect to server.", 'bot');
+        console.error(err);
+    }
+}
+
+sendBtn.addEventListener('click', sendMessage);
+chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+// Speech to Text
+if ('webkitSpeechRecognition' in window) {
+    const recognition = new webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    voiceBtn.addEventListener('click', () => {
+        recognition.lang = langSelect.value === 'hi' ? 'hi-IN' :
+                           langSelect.value === 'te' ? 'te-IN' : 'en-US';
+        recognition.start();
+    });
+
+    recognition.onresult = (event) => {
+        chatInput.value = event.results[0][0].transcript;
+        sendMessage();
+    };
+}
+
+// Scroll to latest chat on page load
+window.addEventListener('DOMContentLoaded', () => {
+    scrollToBottom();
+});
+</script>
+</body>
+</html>

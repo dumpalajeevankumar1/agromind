@@ -1,0 +1,166 @@
+<!-- filepath: c:\Users\happy\Downloads\agromind (2)\agromind\agrochat\templates\custom_login.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AgroMind | Custom Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .auth-container {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            max-width: 420px;
+            width: 100%;
+            padding: 2.5rem 2rem;
+        }
+        .auth-title {
+            font-weight: 700;
+            color: #27ae60;
+            margin-bottom: 1.2rem;
+            text-align: center;
+        }
+        .form-section {
+            display: none;
+        }
+        .form-section.active {
+            display: block;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #333;
+        }
+        .form-control {
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .btn-auth {
+            background: #27ae60;
+            color: #fff;
+            border-radius: 8px;
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        .btn-auth:hover {
+            background: #219653;
+        }
+        .switch-link {
+            color: #27ae60;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .text-center-alt {
+            text-align: center;
+            color: #555;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h2 class="auth-title">🌱 AgroMind</h2>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Login Form -->
+        <div id="login-form" class="form-section active">
+            <form method="POST" action="{% url 'custom_login' %}">
+                {% csrf_token %}
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" placeholder="Username" required>
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Password" required>
+                <button type="submit" class="btn btn-auth">Login</button>
+            </form>
+            <div class="text-center-alt">
+                <span class="switch-link" onclick="switchForm('signup-form')">Sign Up</span> |
+                <span class="switch-link" onclick="switchForm('forgot-form')">Forgot Password?</span>
+            </div>
+        </div>
+
+        <!-- Signup Form -->
+        <div id="signup-form" class="form-section">
+            <form method="POST" action="{% url 'signup' %}">
+                {% csrf_token %}
+                <label class="form-label">Full Name</label>
+                <input type="text" name="full_name" class="form-control" placeholder="Full Name" required>
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" placeholder="Username" required>
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" placeholder="Email Address" required>
+                <label class="form-label">Phone</label>
+                <input type="tel" name="phone" class="form-control" placeholder="Phone Number" pattern="[0-9]{10}" required>
+                <label class="form-label">Farm Name</label>
+                <input type="text" name="farm_name" class="form-control" placeholder="Farm Name (optional)">
+                <label class="form-label">Farm Location</label>
+                <input type="text" name="farm_location" class="form-control" placeholder="Farm Location / Address" required>
+                <label class="form-label">Farm Size</label>
+                <select name="farm_size" class="form-control" required>
+                    <option value="" disabled selected>Farm Size</option>
+                    <option value="small">Small (&lt; 5 acres)</option>
+                    <option value="medium">Medium (5–20 acres)</option>
+                    <option value="large">Large (&gt; 20 acres)</option>
+                </select>
+                <label class="form-label">Primary Crop Type</label>
+                <select name="crop_type" class="form-control" required>
+                    <option value="" disabled selected>Primary Crop Type</option>
+                    <option value="rice">Rice</option>
+                    <option value="wheat">Wheat</option>
+                    <option value="vegetables">Vegetables</option>
+                    <option value="fruits">Fruits</option>
+                    <option value="other">Other</option>
+                </select>
+                <label class="form-label">Password</label>
+                <input type="password" name="password1" class="form-control" placeholder="Password" required>
+                <label class="form-label">Confirm Password</label>
+                <input type="password" name="password2" class="form-control" placeholder="Confirm Password" required>
+                <button type="submit" class="btn btn-auth">Create Account</button>
+            </form>
+            <div class="text-center-alt">
+                Already have an account? <span class="switch-link" onclick="switchForm('login-form')">Login</span>
+            </div>
+        </div>
+
+        <!-- Forgot Password Form -->
+        <div id="forgot-form" class="form-section">
+            <form method="POST" action="{% url 'password_reset' %}">
+                {% csrf_token %}
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" placeholder="Enter your registered email" required>
+                <button type="submit" class="btn btn-auth">Send Reset Link</button>
+            </form>
+            <div class="text-center-alt">
+                Remembered your password? <span class="switch-link" onclick="switchForm('login-form')">Back to Login</span>
+            </div>
+        </div>
+    </div>
+    <script>
+        function switchForm(formId) {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(formId).classList.add('active');
+        }
+    </script>
+</body>
+</html>

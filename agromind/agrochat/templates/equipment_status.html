@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESP Sensor Status - AgroChat Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+:root {
+  --primary-green: #28a745;
+  --offline-gray: #6c757d;
+  --dark-green: #155724;
+  --background-light: #f8f9fa;
+  --card-bg: #ffffff;
+  --text-color: #333333;
+}
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background-light);
+  color: var(--text-color);
+  margin: 0;
+}
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+}
+/* Sidebar */
+.sidebar {
+  width: 280px;
+  background-color: var(--card-bg);
+  padding: 2rem 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.sidebar-header h2 {
+  color: var(--dark-green);
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+.nav-links .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  color: #6c757d;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.3s;
+}
+.nav-links .nav-link i { margin-right: 0.75rem; }
+.nav-links .nav-link:hover,
+.nav-links .nav-link.active { background-color: var(--primary-green); color: #fff; }
+/* Main content */
+.main-content {
+  flex-grow: 1;
+  padding: 2rem 3rem;
+}
+.header h1 {
+  font-weight: 700;
+  color: var(--dark-green);
+  margin-bottom: 0.25rem;
+}
+.header p {
+  font-size: 0.95rem;
+  color: #6c757d;
+  margin-bottom: 2rem;
+}
+.table-card {
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.table-card table {
+  margin-bottom: 0;
+}
+.badge {
+  font-size: 0.85rem;
+}
+footer {
+  text-align: center;
+  padding: 1rem;
+  margin-top: 2rem;
+  color: #6c757d;
+}
+</style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header"><h2>AgroChat 🌱</h2></div>
+    <div class="nav-links my-4">
+      <a href="{% url 'home' %}" class="nav-link"><i class="fas fa-home"></i> Home</a>
+      <a href="{% url 'equipment' %}" class="nav-link active"><i class="fas fa-tools"></i> ESP Sensor</a>
+      <a href="{% url 'chatbot' %}" class="nav-link"><i class="fas fa-robot"></i> Chatbot</a>
+      <a href="{% url 'reports' %}" class="nav-link"><i class="fas fa-chart-line"></i> Reports</a>
+      <hr>
+      <a href="{% url 'profile' %}" class="nav-link"><i class="fas fa-user-circle"></i> Profile</a>
+      <a href="{% url 'settings' %}" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+      <a href="{% url 'logout' %}" class="btn btn-outline-danger w-100 mt-3"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="header">
+      <h1>ESP Sensor Status</h1>
+      <p class="text-muted">Monitor your sensor status and last received data in real-time.</p>
+    </div>
+
+    <div class="table-card">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Equipment</th>
+            <th>Status</th>
+            <th>Last Data Received</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ESP Soil Sensor</td>
+            <td>
+              {% if last_reading %}
+                <span class="badge bg-success">Good</span>
+              {% else %}
+                <span class="badge bg-secondary">Damaged</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if last_reading %}
+                {{ last_reading.timestamp|date:"Y-m-d H:i:s" }}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer>
+      &copy; 2025 AgroChat. All rights reserved.
+    </footer>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
